@@ -10,6 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 import pandas as pd
 import numpy as np
 from random import random
+from datetime import datetime
 
 # import folium to map coordinates data on a map
 
@@ -115,7 +116,11 @@ df['pgps'] = pgps
 df['pgps'] = df['pgps'].str.extract('(loc:.*)' )
 df['pgps'] = df['pgps'].str.replace('loc:' , '')
 df['pgps'] = df['pgps'].str.replace('\+-' , ' ')
-df['lat'] = df['pgps'].str.extract('(^.*)\s') #.astype('float')
-df['long'] = df['pgps'].str.extract('\s(.*)') #.astype('float')
+df['lat'] = df['pgps'].str.extract('(^.*)\s').astype('float')
+df['long'] = df['pgps'].str.extract('\s(.*)').astype('float')
+
+#export df to csv
+filename = datetime.today().strftime('%Y-%m-%d')
+df.to_csv('./Data/'+filename+'.csv')
 
 

@@ -1,3 +1,4 @@
-C:\Users\Data\anaconda3\python.exe 
-"E:\Daft_Web_Scrapping\WebScrapping.py"
-pause
+call activate
+cd  "E:\Daft_Web_Scrapping"
+python WebScrapping.py
+call conda deactivate
