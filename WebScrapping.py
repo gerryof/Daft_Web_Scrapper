@@ -6,21 +6,21 @@ Created on Tue Oct 19 11:22:01 2021
 """
 
 from selenium import webdriver
-from selenium.webdriver.support.ui import WebDriverWait 
 import pandas as pd
-import numpy as np
-from random import random
 from datetime import datetime
+from selenium.webdriver.chrome.options import Options
 
 # import folium to map coordinates data on a map
 
 url = 'https://www.daft.ie/property-for-sale/galway-city?numBeds_from=2&salePrice_to=200000'
 
+#installing add blocker to speed up the page load 
+profile = webdriver.ChromeOptions()
+adblockfile = 'adblock.crx'
+profile.add_extension(adblockfile)
 
-
-driver = webdriver.Chrome()
+driver = webdriver.Chrome(chrome_options = profile)
 driver.get(url)
-
 
 
 driver.switch_to.active_element
@@ -82,35 +82,46 @@ df['size'] = df['size'].str.replace('m²' , '' ).astype('float')
 pdesc = []
 pprop = []
 pgps = []
+pber = []
 
 dfurls = df['urls']
  
 for i in dfurls:
     driver.get(i)
-    
+
     try:
         desc= driver.find_element_by_class_name('PropertyPage__StandardParagraph-sc-14jmnho-8.kDFIyQ').text
         pdesc.append(desc)
     except:
         pdesc.append(None)
-        
+          
     try:
         prop= driver.find_element_by_class_name('PropertyDetailsList__PropertyDetailsListContainer-sc-1cjwtjz-0.bnzQrB').text
         pprop.append(prop)
     except:
         pprop.append(None)
-        
+          
     try:
         gps = driver.find_element_by_css_selector('.NewButton__ButtonContainer-yem86a-4.dFKaNf.button-container [href]')
         gpsurl = gps.get_attribute('href')
         pgps.append(gpsurl)
     except:
         pgps.append(None)
+ 
+    try:
+        ber = driver.find_element_by_class_name('BerDetails__BerImage-sc-14a3wii-0.ddEOTj')
+        ber = ber.get_attribute('alt')
+        pber.append(ber)
+    except:
+        pber.append(None)
         
-    
+
+        
+ 
 df['desc'] = pdesc
 df['pprop'] = pprop
 df['pgps'] = pgps
+df['ber'] = pber
 
 # format gps
 df['pgps'] = df['pgps'].str.extract('(loc:.*)' )
@@ -118,6 +129,7 @@ df['pgps'] = df['pgps'].str.replace('loc:' , '')
 df['pgps'] = df['pgps'].str.replace('\+-' , ' ')
 df['lat'] = df['pgps'].str.extract('(^.*)\s').astype('float')
 df['long'] = df['pgps'].str.extract('\s(.*)').astype('float')
+
 
 #export df to csv
 filename = datetime.today().strftime('%Y-%m-%d')
