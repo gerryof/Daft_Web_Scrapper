@@ -126,7 +126,8 @@ df['ber'] = pber
 # format gps
 df['pgps'] = df['pgps'].str.extract('(loc:.*)' )
 df['pgps'] = df['pgps'].str.replace('loc:' , '')
-df['pgps'] = df['pgps'].str.replace('\+-' , ' ')
+#30/11/2021 correction , the negative symbol is needed - old replace('\+-' , ' ')
+df['pgps'] = df['pgps'].str.replace('\+' , ' ')
 df['lat'] = df['pgps'].str.extract('(^.*)\s').astype('float')
 df['long'] = df['pgps'].str.extract('\s(.*)').astype('float')
 
