@@ -10,18 +10,22 @@ import pandas as pd
 from datetime import datetime
 from selenium.webdriver.chrome.options import Options
 
-# import folium to map coordinates data on a map
-
-url = 'https://www.daft.ie/property-for-sale/galway-city?numBeds_from=2&salePrice_to=200000'
+#18/01/2021 widening search from price_to=200000 to price_to+300000
+url = 'https://www.daft.ie/property-for-sale/galway-city?numBeds_from=2&salePrice_to=300000'
 
 #installing add blocker to speed up the page load 
 profile = webdriver.ChromeOptions()
 adblockfile = 'adblock.crx'
 profile.add_extension(adblockfile)
 
-driver = webdriver.Chrome(chrome_options = profile)
-driver.get(url)
+#set up selenium driver
+# 18/01/2021 Left to its own devices chrome will auto update and make the downloaded chromedriver redundant. One way to handle this is
+# a driver manager, from webdriver_manager.chrome import ChromeDriverManager, however as the drivers change some elements in the class name's also change.
+# this might only be an issue if  you finding elements by class names, there might be better ways of doing this. However as I seem to be stuck with the
+# class name the solution I've used is to turn off the chrome auto updates.
+driver = webdriver.Chrome(chrome_options=profile)
 
+driver.get(url)
 
 driver.switch_to.active_element
 
@@ -31,12 +35,15 @@ button[1].click()
 
 driver.switch_to.active_element
 
-driver.find_element_by_class_name('styles__CloseContainer-qea560-4.LGmOf').click()
+button2 = driver.find_element_by_class_name('styles__CloseContainer-qea560-4.gUmMhe')
+
+button2.click()
 
 driver.switch_to.active_element
 
-adds = driver.find_elements_by_class_name('Card__Content-x1sjdn-9.iEbIAZ')
-urlclass = driver.find_elements_by_css_selector('.SearchPage__Result-gg133s-2.itNYNv [href]')
+
+adds = driver.find_elements_by_class_name('Card__Content-x1sjdn-9.hqrqJL')
+urlclass = driver.find_elements_by_css_selector('.SearchPage__Result-gg133s-2.hAooid [href]')
 
 #data poitns from the search page
 price = []
@@ -96,20 +103,20 @@ for i in dfurls:
         pdesc.append(None)
           
     try:
-        prop= driver.find_element_by_class_name('PropertyDetailsList__PropertyDetailsListContainer-sc-1cjwtjz-0.bnzQrB').text
+        prop= driver.find_element_by_class_name('PropertyDetailsList__PropertyDetailsListContainer-sc-1cjwtjz-0.iOxyyd').text
         pprop.append(prop)
     except:
         pprop.append(None)
           
     try:
-        gps = driver.find_element_by_css_selector('.NewButton__ButtonContainer-yem86a-4.dFKaNf.button-container [href]')
+        gps = driver.find_element_by_css_selector('.NewButton__ButtonContainer-yem86a-4.eIIlIm.button-container [href]')
         gpsurl = gps.get_attribute('href')
         pgps.append(gpsurl)
     except:
         pgps.append(None)
  
     try:
-        ber = driver.find_element_by_class_name('BerDetails__BerImage-sc-14a3wii-0.ddEOTj')
+        ber = driver.find_element_by_class_name('BerDetails__BerImage-sc-14a3wii-0.etlFKB')
         ber = ber.get_attribute('alt')
         pber.append(ber)
     except:
